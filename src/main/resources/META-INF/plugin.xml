@@ -2,10 +2,10 @@
 <idea-plugin>
     <id>de.jomipa.automagix-pipeline-numbers</id>
     <name>Automagix Pipeline Numbers</name>
-    <vendor>jomipa</vendor>
+    <vendor email="vanadinit@quantentunnel.de" url="https://github.com/vanadinit">vanadinit</vendor>
 
     <description><![CDATA[
-        Displays 0-based step numbers for pipeline items in Automagix YAML files.
+        Displays pipeline indices for <a href="https://codeberg.org/vanadinit/automagix">Automagix</a> YAML scripts.
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
