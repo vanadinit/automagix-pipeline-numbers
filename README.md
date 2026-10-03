@@ -1,155 +1,91 @@
-# Automagix-pipeline-numbers
+# Automagix Pipeline Numbers
 
-[![Twitter Follow](https://img.shields.io/badge/follow-%40JBPlatform-1DA1F2?logo=twitter)](https://twitter.com/JBPlatform)
-[![Developers Forum](https://img.shields.io/badge/JetBrains%20Platform-Join-blue)][jb:forum]
+[![Version](https://img.shields.io/badge/version-1.0.0--SNAPSHOT-blue.svg)](gradle.properties)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Overview
+An IntelliJ Platform plugin (compatible with IntelliJ IDEA, PyCharm, and other JetBrains IDEs) that displays 0-based step index numbers at the start of each pipeline step in [Automagix](https://codeberg.org/vanadinit/automagix) YAML files.
 
-This repository implements an IntelliJ Platform plugin.
+---
 
-## Demo Functionality
+## Features
 
-The sample plugin adds a `My Tool Window` tool window with a simple functionality of shuffling a random number.
+- **0-Based Pipeline Indexing**: Automatically displays step numbers (`0`, `1`, `2`, ...) at the beginning of each list item in your `pipeline` sequence.
+- **Strict Scope**: Only targets YAML files containing a top-level `pipeline:` sequence. Other YAML files and nested keys are ignored.
+- **Modern Inlay Hints**: Built on the IntelliJ Declarative Inlay Hints API. Hints render smoothly without altering the underlying file content.
+- **Configurable**: Easily enable or disable hints under `Settings` &rarr; `Editor` &rarr; `Inlay Hints` &rarr; `YAML` &rarr; `Automagix Pipeline Numbers`.
+- **Dynamic Plugin Support**: Can be loaded and unloaded dynamically without restarting the IDE.
 
-## Plugin structure
+---
 
-A generated project contains the following content structure:
+## Example
 
-```
-.
-├── .run/                   Predefined Run/Debug Configurations
-├── gradle
-│   ├── wrapper/            Gradle Wrapper
-│   ├── libs.versions.toml  Version catalog
-├── src                     Plugin sources
-│   └── main
-│       ├── kotlin/         Kotlin production sources
-│       └── resources/      Plugin resources
-│           ├── META-INF/   Plugin configuration file and logo
-│           └── messages/   Message bundles
-├── .gitignore              Git ignoring rules
-├── build.gradle.kts        Gradle build configuration
-├── gradle.properties       Gradle configuration properties
-├── gradlew                 *nix Gradle Wrapper script
-├── gradlew.bat             Windows Gradle Wrapper script
-├── README.md               This file
-└── settings.gradle.kts     Gradle project settings
+```yaml
+name: Automagix Pipeline Example
+pipeline:
+  0 - python: PVARS.moin = True
+  1 - PVARS.moin?local: echo 'Moin'
+  2 - python: PVARS.moin = False
+  3 - a=local: uptime
+cleanup:
+  - local: echo 'Cleaning up...'
 ```
 
-In addition to the configuration files, the most crucial part is the `src` directory, which contains our implementation
-and the manifest for our plugin – [plugin.xml][file:plugin.xml].
+*(Step indices are rendered as editor inlay hints; they are not part of the file text)*
 
-> [!NOTE]
-> To use Java in your plugin, create the `/src/main/java` directory.
+---
 
-The plugin logo is placed in `src/main/resources/META-INF/pluginIcon.svg`.
-See [Plugin Logo][docs:logo] for more information and logo requirements.
+## Installation
 
-## Build script
+### Manual Installation (From ZIP)
 
-The [build.gradle.kts][file:build.gradle.kts] is the core of the project definition.
-It applies three Gradle plugins:
+1. Download or build the plugin archive (`automagix-pipeline-numbers-<version>.zip`) from `build/distributions/`.
+2. In your IDE, open **Settings** (`Ctrl+Alt+S` on Linux/Windows, `Cmd+,` on macOS) &rarr; **Plugins**.
+3. Click the gear icon (**⚙️**) at the top and select **Install Plugin from Disk...**.
+4. Select the `.zip` file and click **OK**.
 
-| Plugin                            | Description                                                                      |
-|-----------------------------------|----------------------------------------------------------------------------------|
-| `org.jetbrains.kotlin.jvm`        | Adds Kotlin support                                                              |
-| `org.jetbrains.changelog`         | Simplifies patching the [CHANGELOG.md][file:CHANGELOG.md] file                   |
-| `org.jetbrains.intellij.platform` | The [IntelliJ Platform Gradle Plugin][docs:intellij-platform-gradle-plugin-docs] |
+---
 
-The `intellijPlatform` dependencies block selects the IDE to compile against:
+## Settings
 
-```kotlin
-intellijIdea("2025.3.6.1")
-```
+To toggle or customize the hints:
+1. Open **Settings / Preferences** &rarr; **Editor** &rarr; **Inlay Hints** &rarr; **YAML**.
+2. Locate **Automagix Pipeline Numbers**.
+3. Toggle the checkbox to enable or disable hints as desired. A live preview is displayed in the settings pane.
 
-See [Target Versions][docs:target-version] for more information.
+---
 
-The `intellijPlatform` dependencies block also contains a dependency on the platform testing framework:
+## Development & Building
 
-```kotlin
-testFramework(TestFrameworkType.Platform)
-```
+### Prerequisites
 
-See [Testing][docs:testing] for more information
+- JDK 21+ (managed automatically via Gradle toolchain)
+- Gradle (use the included `./gradlew` wrapper)
 
-## Plugin configuration file
+### Common Tasks
 
-The plugin configuration file is a [plugin.xml][file:plugin.xml] file located in the `src/main/resources/META-INF`
-directory.
-It provides general information about the plugin, its dependencies, extensions, and listeners.
+- **Run tests**:
+  ```bash
+  ./gradlew test
+  ```
 
-You can read more about this file in the [Plugin Configuration File][docs:plugin.xml] section of our documentation.
+- **Run a sandbox IDE with the plugin installed**:
+  ```bash
+  ./gradlew runIde
+  ```
 
-### Plugin ID and name
+- **Build the distribution ZIP**:
+  ```bash
+  ./gradlew buildPlugin
+  ```
+  The packaged archive will be created in `build/distributions/`.
 
-Generated plugin ID and name may require adjustment.
+- **Verify plugin compatibility**:
+  ```bash
+  ./gradlew verifyPlugin
+  ```
 
-These values are generated based on _Group ID_ and _Artifact ID_ provided in the IDE Plugin wizard.
-It is recommended to review `<id>` and `<name>` elements in the plugin.xml file, and adjust them if needed.
+---
 
-Please note that Gradle properties `rootProject.name` and `project.group` don't need to match the `<id>` and `<name>`
-elements.
-There is no IntelliJ Platform-related reason they should as they serve different functions.
+## License
 
-## Predefined Run/Debug configurations
-
-Within the default project structure, there is a `.run` directory provided containing predefined *Run/Debug
-configurations* that expose corresponding Gradle tasks:
-
-| Configuration name  | Description                                                                                                                                                                           |
-|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Run IDE with Plugin | Runs [`:runIde`][docs:intellij-platform-gradle-plugin-runIde] IntelliJ Platform Gradle Plugin task. Use the *Debug* icon for plugin debugging.                                        |
-| Run Tests           | Runs [`:check`][gradle:lifecycle-tasks] Gradle task.                                                                                                                                  |
-| Run Verifications   | Runs [`:verifyPlugin`][docs:intellij-platform-gradle-plugin-verifyPlugin] IntelliJ Platform Gradle Plugin task to check the plugin compatibility against the specified IntelliJ IDEs. |
-
-> [!NOTE]
-> You can find the logs from the running task in the `idea.log` tab.
-
-## Publishing the plugin
-
-> [!TIP]
-> Make sure to follow all guidelines listed in [Publishing a Plugin][docs:publishing] to follow all recommended and
-required steps.
-
-Releasing a plugin to [JetBrains Marketplace](https://plugins.jetbrains.com) is a straightforward operation that uses
-the `publishPlugin` Gradle task provided by
-the [intellij-platform-gradle-plugin][docs:intellij-platform-gradle-plugin-docs].
-
-You can also upload the plugin to the [JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/upload)
-manually via UI.
-
-## Useful links
-
-- [IntelliJ Platform SDK Plugin SDK][docs]
-- [IntelliJ Platform Gradle Plugin Documentation][docs:intellij-platform-gradle-plugin-docs]
-- [IntelliJ Platform Explorer][jb:ipe]
-- [JetBrains Marketplace Quality Guidelines][jb:quality-guidelines]
-- [IntelliJ Platform UI Guidelines][jb:ui-guidelines]
-- [JetBrains Marketplace Paid Plugins][jb:paid-plugins]
-- [IntelliJ SDK Code Samples][gh:code-samples]
-
-[docs]: https://plugins.jetbrains.com/docs/intellij
-[docs:plugin.xml]: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html?from=IJPluginReadmeFile
-[docs:publishing]: https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginReadmeFile
-[docs:intellij-platform-gradle-plugin-docs]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html?from=IJPluginReadmeFile
-[docs:intellij-platform-gradle-plugin-runIde]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-tasks.html?from=IJPluginReadmeFile#runIde
-[docs:intellij-platform-gradle-plugin-verifyPlugin]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-tasks.html?from=IJPluginReadmeFile#verifyPlugin
-[docs:logo]: https://plugins.jetbrains.com/docs/intellij/plugin-icon-file.html?from=IJPluginReadmeFile
-[docs:target-version]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html?from=IJPluginReadmeFile#target-versions
-[docs:testing]: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html?from=IJPluginReadmeFile#testing
-
-[file:build.gradle.kts]: ./build.gradle.kts
-[file:CHANGELOG.md]: ./CHANGELOG.md
-[file:gradle.properties]: ./gradle.properties
-[file:plugin.xml]: ./src/main/resources/META-INF/plugin.xml
-
-[gh:code-samples]: https://github.com/JetBrains/intellij-sdk-code-samples
-
-[gradle:lifecycle-tasks]: https://docs.gradle.org/current/userguide/java_plugin.html#lifecycle_tasks
-
-[jb:github]: https://github.com/JetBrains/.github/blob/main/profile/README.md
-[jb:forum]: https://platform.jetbrains.com/
-[jb:quality-guidelines]: https://plugins.jetbrains.com/docs/marketplace/quality-guidelines.html
-[jb:paid-plugins]: https://plugins.jetbrains.com/docs/marketplace/paid-plugins-marketplace.html
-[jb:ipe]: https://jb.gg/ipe
-[jb:ui-guidelines]: https://jetbrains.github.io/ui
+This project is licensed under the [MIT License](LICENSE).

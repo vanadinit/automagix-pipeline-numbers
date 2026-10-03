@@ -40,7 +40,7 @@ class AutomagixPipelineInlayHintsProvider : InlayHintsProvider {
             sink.addPresentation(
                 position = InlineInlayPosition(offset = element.textRange.startOffset, relatedToPrevious = false),
                 payloads = null,
-                tooltip = "Automagix pipeline step #$index",
+                tooltip = "Automagix pipeline index #$index",
                 hintFormat = HintFormat.default
             ) {
                 text("$index")

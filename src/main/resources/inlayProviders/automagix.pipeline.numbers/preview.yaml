@@ -1,4 +1,0 @@
-name: Example Automagix Pipeline
-pipeline:
-  - python: print("First step")
-  - local: echo "Second step"
